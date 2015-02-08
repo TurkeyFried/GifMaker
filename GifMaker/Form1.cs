@@ -66,14 +66,13 @@ namespace GifMaker
             newPicture.BringToFront();
             imageLibrary.Controls.Add(newPicture);
 
-            activeControl.BringToFront();
-
             // http://stackoverflow.com/a/3870225/1978219
             newPicture.MouseDown += new MouseEventHandler(libraryPicture_MouseDown);
             newPicture.MouseMove += new MouseEventHandler(libraryPicture_MouseMove);
             newPicture.MouseUp += new MouseEventHandler(libraryPicture_MouseUp);
 
             this.Controls.Add(activeControl);
+            activeControl.BringToFront();
 
             previousLocation = e.Location;
             Cursor = Cursors.Hand;
@@ -130,10 +129,10 @@ namespace GifMaker
 
         private void addToLibrary(MagickImage fileImage)
         {
-            if (libraryList.Contains(fileImage))
-            {
-                return;
-            }
+            //if (libraryList.Contains(fileImage))
+            //{
+            //    return;
+            //}
 
             PictureBox newPicture = new PictureBox();
             newPicture.Image = fileImage.ToBitmap();

@@ -61,9 +61,10 @@
             // 
             // previewBox
             // 
-            this.previewBox.Location = new System.Drawing.Point(12, 214);
+            this.previewBox.BackColor = System.Drawing.SystemColors.Window;
+            this.previewBox.Location = new System.Drawing.Point(2, 214);
             this.previewBox.Name = "previewBox";
-            this.previewBox.Size = new System.Drawing.Size(275, 257);
+            this.previewBox.Size = new System.Drawing.Size(285, 269);
             this.previewBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.previewBox.TabIndex = 3;
             this.previewBox.TabStop = false;
@@ -82,19 +83,21 @@
             this.imageContainer.AllowDrop = true;
             this.imageContainer.AutoScroll = true;
             this.imageContainer.BackColor = System.Drawing.SystemColors.Window;
-            this.imageContainer.Location = new System.Drawing.Point(12, 12);
+            this.imageContainer.Location = new System.Drawing.Point(2, 0);
             this.imageContainer.Name = "imageContainer";
-            this.imageContainer.Size = new System.Drawing.Size(535, 100);
+            this.imageContainer.Size = new System.Drawing.Size(592, 100);
             this.imageContainer.TabIndex = 6;
             this.imageContainer.DragDrop += new System.Windows.Forms.DragEventHandler(this.imageContainer_DragDrop);
             // 
             // imageLibrary
             // 
+            this.imageLibrary.AllowDrop = true;
             this.imageLibrary.AutoScroll = true;
             this.imageLibrary.BackColor = System.Drawing.SystemColors.Window;
-            this.imageLibrary.Location = new System.Drawing.Point(584, 12);
+            this.imageLibrary.Dock = System.Windows.Forms.DockStyle.Right;
+            this.imageLibrary.Location = new System.Drawing.Point(600, 0);
             this.imageLibrary.Name = "imageLibrary";
-            this.imageLibrary.Size = new System.Drawing.Size(300, 459);
+            this.imageLibrary.Size = new System.Drawing.Size(300, 483);
             this.imageLibrary.TabIndex = 7;
             // 
             // numericUpDown1
