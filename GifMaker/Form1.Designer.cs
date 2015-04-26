@@ -88,8 +88,6 @@
             this.imageContainer.Name = "imageContainer";
             this.imageContainer.Size = new System.Drawing.Size(592, 100);
             this.imageContainer.TabIndex = 6;
-            this.imageContainer.DragDrop += new System.Windows.Forms.DragEventHandler(this.imageContainer_DragDrop);
-            this.imageContainer.DragEnter += new System.Windows.Forms.DragEventHandler(this.imageContainer_DragEnter);
             // 
             // imageLibrary
             // 
@@ -136,10 +134,6 @@
             this.Controls.Add(this.saveButton);
             this.Name = "Form1";
             this.Text = "Form1";
-            this.DragDrop += new System.Windows.Forms.DragEventHandler(this.OnDragDrop);
-            this.DragEnter += new System.Windows.Forms.DragEventHandler(this.OnDragEnter);
-            this.DragOver += new System.Windows.Forms.DragEventHandler(this.OnDragOver);
-            this.DragLeave += new System.EventHandler(this.OnDragLeave);
             ((System.ComponentModel.ISupportInitialize)(this.previewBox)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             this.ResumeLayout(false);
