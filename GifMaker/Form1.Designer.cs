@@ -35,6 +35,7 @@
             this.imageContainer = new System.Windows.Forms.Panel();
             this.imageLibrary = new System.Windows.Forms.Panel();
             this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
+            this.batchSaveButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.previewBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.SuspendLayout();
@@ -88,6 +89,7 @@
             this.imageContainer.Size = new System.Drawing.Size(592, 100);
             this.imageContainer.TabIndex = 6;
             this.imageContainer.DragDrop += new System.Windows.Forms.DragEventHandler(this.imageContainer_DragDrop);
+            this.imageContainer.DragEnter += new System.Windows.Forms.DragEventHandler(this.imageContainer_DragEnter);
             // 
             // imageLibrary
             // 
@@ -108,11 +110,23 @@
             this.numericUpDown1.TabIndex = 8;
             this.numericUpDown1.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged);
             // 
+            // batchSaveButton
+            // 
+            this.batchSaveButton.Location = new System.Drawing.Point(443, 340);
+            this.batchSaveButton.Name = "batchSaveButton";
+            this.batchSaveButton.Size = new System.Drawing.Size(98, 33);
+            this.batchSaveButton.TabIndex = 9;
+            this.batchSaveButton.Text = "Batch Save";
+            this.batchSaveButton.UseVisualStyleBackColor = true;
+            this.batchSaveButton.Click += new System.EventHandler(this.batchSaveButton_Click);
+            // 
             // Form1
             // 
+            this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(900, 483);
+            this.Controls.Add(this.batchSaveButton);
             this.Controls.Add(this.numericUpDown1);
             this.Controls.Add(this.imageLibrary);
             this.Controls.Add(this.imageContainer);
@@ -122,6 +136,10 @@
             this.Controls.Add(this.saveButton);
             this.Name = "Form1";
             this.Text = "Form1";
+            this.DragDrop += new System.Windows.Forms.DragEventHandler(this.OnDragDrop);
+            this.DragEnter += new System.Windows.Forms.DragEventHandler(this.OnDragEnter);
+            this.DragOver += new System.Windows.Forms.DragEventHandler(this.OnDragOver);
+            this.DragLeave += new System.EventHandler(this.OnDragLeave);
             ((System.ComponentModel.ISupportInitialize)(this.previewBox)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             this.ResumeLayout(false);
@@ -137,6 +155,7 @@
         private System.Windows.Forms.Panel imageContainer;
         private System.Windows.Forms.Panel imageLibrary;
         private System.Windows.Forms.NumericUpDown numericUpDown1;
+        private System.Windows.Forms.Button batchSaveButton;
     }
 }
 

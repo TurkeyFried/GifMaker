@@ -9,12 +9,34 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using ImageMagick;
 
 namespace GifMaker
 {
+    class MovablePicBox : PictureBox
+    {
+        Point mdLoc;
+
+        protected override void OnMouseDown(MouseEventArgs e)
+        {
+            base.OnMouseDown(e);
+            mdLoc = e.Location;
+        }
+
+        protected override void OnMouseMove(MouseEventArgs e)
+        {
+            base.OnMouseMove(e);
+
+            if (e.Button == MouseButtons.Left)
+            {
+                this.Left += e.X - mdLoc.X;
+                this.Top += e.Y - mdLoc.Y;
+            }
+        }
+    }
+
+
     public partial class Form1 : Form
     {
         private const int thumbnailX = 100;
@@ -22,6 +44,8 @@ namespace GifMaker
 
         private int currentColumn = 0;
         private int currentRow = 0;
+
+        private int previewCount = 0;
 
         private PictureBox activeControl;
         private Point previousLocation;
@@ -34,8 +58,8 @@ namespace GifMaker
             InitializeComponent();
 
             activeControl = null;
-            libraryList = new MagickImageCollection();
-            workList = new MagickImageCollection();
+            this.libraryList = new MagickImageCollection();
+            this.workList = new MagickImageCollection();
         }
 
         private void saveButton_Click(object sender, EventArgs e)
@@ -43,61 +67,81 @@ namespace GifMaker
             saveImage();
         }
 
+        private void batchSaveButton_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog saveDialog = new SaveFileDialog();
+            saveDialog.Filter = "Gif Animation (*.gif)|*.gif";
+
+            if (saveDialog.ShowDialog() == DialogResult.OK)
+            {
+                int numberOfImages = 2;
+                int speed = 30;
+                MagickImageCollection toSave = new MagickImageCollection();
+
+                string directory = Path.GetDirectoryName(saveDialog.FileName);
+
+                Console.WriteLine("batchSaveButton_Click");
+                foreach (MagickImage image in this.libraryList)
+                {
+                    image.AnimationDelay = speed;
+                    toSave.Add(image);
+
+                    if (toSave.Count == numberOfImages)
+                    {
+                        toSave.Optimize();
+                        string ggg = Path.GetFileNameWithoutExtension(toSave[0].FileName);
+                        string fff = directory + "\\" + ggg;
+                        string hhh = fff.Remove(fff.Length - 1);
+                        toSave.Write(hhh + ".gif");
+                        toSave.Clear();
+                    }
+                }
+
+            }
+        }
+
         private void browse_Click(object sender, EventArgs e)
         {
             loadImage();
-        }
-
-        private void imageContainer_DragDrop(object sender, DragEventArgs e)
-        {
-            Console.Write("imageContainer_DragDrop");
         }
 
         void libraryPicture_MouseDown(object sender, MouseEventArgs e)
         {
             activeControl = sender as PictureBox;
 
-            PictureBox newPicture = new PictureBox();
-            newPicture.Image = activeControl.Image;
-            newPicture.SizeMode = activeControl.SizeMode;
-            newPicture.BorderStyle = activeControl.BorderStyle;
-            newPicture.Size = activeControl.Size;
+            PictureBox newPicture = createThumbnail(activeControl.Image);
+            this.Controls.Add(newPicture);
+
             newPicture.Location = activeControl.Location;
             newPicture.BringToFront();
-            imageLibrary.Controls.Add(newPicture);
 
             // http://stackoverflow.com/a/3870225/1978219
             newPicture.MouseDown += new MouseEventHandler(libraryPicture_MouseDown);
-            newPicture.MouseMove += new MouseEventHandler(libraryPicture_MouseMove);
             newPicture.MouseUp += new MouseEventHandler(libraryPicture_MouseUp);
 
-            this.Controls.Add(activeControl);
             activeControl.BringToFront();
-
-            previousLocation = e.Location;
-            Cursor = Cursors.Hand;
-        }
-
-        void libraryPicture_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (activeControl == null || activeControl.Image == null)
-            {
-                return;
-            }
-
-            var location = activeControl.Location;
-            location.Offset(e.Location.X - previousLocation.X, e.Location.Y - previousLocation.Y);
-            activeControl.Location = location;
         }
 
         void libraryPicture_MouseUp(object sender, MouseEventArgs e)
         {
-            if (activeControl == null || activeControl.Image == null)
+            if (activeControl == null)
             {
                 return;
             }
+
+            // improve the contains
+            if (imageContainer.ClientRectangle.Contains(activeControl.Location))
+            {
+                imageContainer.Controls.Add(activeControl);
+                imageContainer.BringToFront();
+
+                activeControl.Location = new Point(thumbnailX * previewCount + imageContainer.Location.X, thumbnailY * 0);
+                previewCount++;
+
+                return;
+            }
+
             activeControl.Dispose();
-            Cursor = Cursors.Default;
         }
 
         private void loadImage()
@@ -129,18 +173,8 @@ namespace GifMaker
 
         private void addToLibrary(MagickImage fileImage)
         {
-            //if (libraryList.Contains(fileImage))
-            //{
-            //    return;
-            //}
-
-            PictureBox newPicture = new PictureBox();
-            newPicture.Image = fileImage.ToBitmap();
-            newPicture.SizeMode = PictureBoxSizeMode.Zoom;
-            newPicture.BorderStyle = BorderStyle.FixedSingle;
-            newPicture.Size = new Size(thumbnailX, thumbnailY);
-
-            newPicture.Location = new Point(thumbnailX * currentColumn, thumbnailY * currentRow);
+            MovablePicBox newPicture = createThumbnail(fileImage.ToBitmap());
+            newPicture.Location = new Point(thumbnailX * currentColumn + imageLibrary.Location.X, thumbnailY * currentRow + imageLibrary.Location.Y);
 
             if (currentColumn >= 2)
             {
@@ -152,19 +186,15 @@ namespace GifMaker
                 currentColumn++;
             }
 
-            imageLibrary.Controls.Add(newPicture);
-
+            this.Controls.Add(newPicture);
             newPicture.BringToFront();
 
-            // http://stackoverflow.com/a/3870225/1978219
             newPicture.MouseDown += new MouseEventHandler(libraryPicture_MouseDown);
-            newPicture.MouseMove += new MouseEventHandler(libraryPicture_MouseMove);
             newPicture.MouseUp += new MouseEventHandler(libraryPicture_MouseUp);
 
-            //fileImage.AnimationDelay = 300;
+            fileImage.AnimationDelay = 30;
             libraryList.Add(fileImage);
 
-            //MagickImageCollection previewGif = createGif(libraryList);
             previewBox.Image = libraryList.ToBitmap(ImageFormat.Gif);
         }
 
@@ -191,14 +221,12 @@ namespace GifMaker
 
             if (saveDialog.ShowDialog() == DialogResult.OK)
             {
-
-
-                foreach (MagickImage image in libraryList)
+                foreach (MagickImage image in this.libraryList)
                 {
-                    image.AnimationDelay = 3;
+                    image.AnimationDelay = 30;
                 }
 
-                libraryList.Write(saveDialog.FileName);
+                this.libraryList.Write(saveDialog.FileName);
             }
         }
 
@@ -212,6 +240,20 @@ namespace GifMaker
             }
 
             previewBox.Image = libraryList.ToBitmap(ImageFormat.Gif);
+        }
+
+        private MovablePicBox createThumbnail(Image image)
+        {
+            MovablePicBox newPicture = new MovablePicBox();
+            newPicture.Image = image;
+
+            newPicture.SizeMode = PictureBoxSizeMode.Zoom;
+            newPicture.BorderStyle = BorderStyle.FixedSingle;
+
+            newPicture.Size = new Size(thumbnailX, thumbnailY);
+            newPicture.BackColor = Color.White;
+
+            return newPicture;
         }
     }
 }
